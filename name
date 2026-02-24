@@ -1,0 +1,10 @@
+index=m365 sourcetype=o365:management:activity 
+Workload=MicrosoftTeams 
+Operation=MeetingParticipantDetail 
+earliest=-7d latest=now
+| eval participant=mvzip('Attendees{}.DisplayName', 'Attendees{}.UPN', "|")
+| mvexpand participant
+| eval DisplayName=mvindex(split(participant, "|"), 0)
+| eval UPN=mvindex(split(participant, "|"), 1)
+| table _time MeetingDetailId ItemName JoinTime LeaveTime DisplayName UPN DeviceInformation ClientIP IsJoinedFromLobby UserId
+| sort MeetingDetailId, JoinTime
